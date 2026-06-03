@@ -9,3 +9,5 @@ tmp.txt
 .vercel/
 .env*
 !.env.example
+
+.vercel

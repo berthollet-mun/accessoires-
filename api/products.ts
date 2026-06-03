@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 
-import { prisma } from './_prisma';
-import { toApiProduct } from './_productPresenter';
+import { prisma } from './_prisma.js';
+import { toApiProduct } from './_productPresenter.js';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'GET') {
