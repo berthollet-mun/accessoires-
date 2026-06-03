@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import type { SyntheticEvent } from 'react';
 import { Product } from '../../models/types';
 import { Link } from 'react-router-dom';
 import { openDB } from 'idb';
@@ -9,6 +10,8 @@ import { useCartStore } from '../../store/useCartStore';
 import { Heart, ShoppingBag } from 'lucide-react';
 import { motion } from 'motion/react';
 import { maskProducts } from '../../utils/productMask';
+
+const fallbackProductImage = 'https://images.unsplash.com/photo-1548074902-86ee6dd529fa?auto=format&fit=crop&q=80&w=1000';
 
 export default function ProductList() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -70,6 +73,12 @@ export default function ProductList() {
     }
   };
 
+  const handleImageError = (event: SyntheticEvent<HTMLImageElement>) => {
+    if (event.currentTarget.src !== fallbackProductImage) {
+      event.currentTarget.src = fallbackProductImage;
+    }
+  };
+
   if (priceSort === 'asc') {
     filteredProducts.sort((a, b) => a.price - b.price);
   } else if (priceSort === 'desc') {
@@ -98,7 +107,7 @@ export default function ProductList() {
           {/* Hero Image (We use the first product as featured) */}
           {products[0]?.image_url ? (
             <div className="hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 w-1/2 h-full items-center justify-center p-12 pointer-events-none">
-              <img src={products[0].image_url} alt="Featured" className="w-full h-full max-h-[500px] object-cover rounded-[2rem] drop-shadow-2xl opacity-90" />
+              <img src={products[0].image_url} alt="Featured" onError={handleImageError} className="w-full h-full max-h-[500px] object-cover rounded-[2rem] drop-shadow-2xl opacity-90" />
             </div>
           ) : null}
         </div>
@@ -192,7 +201,7 @@ export default function ProductList() {
               <div className="flex-1 flex items-center justify-center relative w-full aspect-[4/5] rounded-xl overflow-hidden mb-6">
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-primary-text/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-full blur-xl scale-75"></div>
                 {product.image_url ? (
-                   <img src={product.image_url} alt={product.name} className="object-cover object-center w-full h-full group-hover:scale-110 transition-transform duration-500" />
+                   <img src={product.image_url} alt={product.name} onError={handleImageError} className="object-cover object-center w-full h-full group-hover:scale-110 transition-transform duration-500" />
                 ) : (
                   <div className="text-primary-text/20 text-[10px] font-bold uppercase tracking-widest border border-base-border/10 border-dashed w-16 h-16 rounded-xl flex items-center justify-center">Pas d'Img</div>
                 )}
