@@ -73,6 +73,143 @@ html * {
   to { opacity: 1; }
 }
 
+@keyframes admin-enter {
+  from { opacity: 0; transform: translateY(18px) scale(0.985); filter: blur(8px); }
+  to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+}
+
+@keyframes admin-shimmer {
+  0% { transform: translateX(-120%); }
+  100% { transform: translateX(120%); }
+}
+
+@keyframes aura-loader {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.animate-admin-enter {
+  animation: admin-enter 0.72s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.admin-shell-card,
+.admin-panel,
+.admin-metric,
+.admin-alert {
+  border: 1px solid color-mix(in srgb, var(--border-color) 85%, transparent);
+  background:
+    linear-gradient(135deg, rgba(255,255,255,0.055), rgba(255,255,255,0.018)),
+    var(--secondary);
+  box-shadow: 0 22px 80px rgba(0,0,0,0.24);
+  backdrop-filter: blur(18px);
+}
+
+.admin-shell-card {
+  border-radius: 2rem;
+}
+
+.admin-panel,
+.admin-metric,
+.admin-alert {
+  border-radius: 1.75rem;
+}
+
+.admin-hero {
+  position: relative;
+  border-radius: 2rem;
+  background:
+    linear-gradient(135deg, rgba(255,255,255,0.96), rgba(255,255,255,0.78)),
+    radial-gradient(circle at 15% 15%, rgba(201,160,91,0.28), transparent 32%);
+  box-shadow: 0 22px 90px rgba(0,0,0,0.22);
+}
+
+.admin-hero::after {
+  content: "";
+  position: absolute;
+  inset: auto -20% -45% 12%;
+  height: 70%;
+  background: radial-gradient(circle, rgba(201,160,91,0.22), transparent 58%);
+  pointer-events: none;
+}
+
+.admin-metric,
+.admin-panel,
+.admin-alert {
+  transition: transform 280ms ease, border-color 280ms ease, box-shadow 280ms ease;
+}
+
+.admin-metric:hover,
+.admin-panel:hover {
+  transform: translateY(-3px);
+  border-color: rgba(201,160,91,0.34);
+  box-shadow: 0 28px 90px rgba(0,0,0,0.32);
+}
+
+.admin-action-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 999px;
+  background: rgba(201,160,91,0.16);
+  color: var(--accent-500);
+  border: 1px solid rgba(201,160,91,0.22);
+  padding: 0.75rem 1rem;
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  transition: all 240ms ease;
+}
+
+.admin-action-button:hover {
+  background: var(--accent-500);
+  color: var(--inverse);
+}
+
+.admin-skeleton {
+  position: relative;
+  overflow: hidden;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.06);
+}
+
+.admin-skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  width: 50%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
+  animation: admin-shimmer 1.2s ease-in-out infinite;
+}
+
+.aura-boot {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: grid;
+  place-items: center;
+  background: #000;
+  color: #fff;
+}
+
+.aura-boot__bar {
+  position: relative;
+  overflow: hidden;
+  width: min(320px, 70vw);
+  height: 2px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.12);
+}
+
+.aura-boot__bar::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, var(--accent-500), transparent);
+  animation: aura-loader 1s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
+
 .page-transition-enter {
   opacity: 0;
   transform: translateY(10px);

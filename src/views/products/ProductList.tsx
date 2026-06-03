@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import type { SyntheticEvent } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { openDB } from 'idb';
 import { ArrowRight, Heart, ShoppingBag } from 'lucide-react';
 import { motion } from 'motion/react';
@@ -16,11 +16,17 @@ import { maskProducts } from '../../utils/productMask';
 const fallbackProductImage = 'https://images.unsplash.com/photo-1548074902-86ee6dd529fa?auto=format&fit=crop&q=80&w=1000';
 
 export default function ProductList() {
+  const location = useLocation();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
   const { searchQuery, categoryFilter, setCategoryFilter, priceSort, setPriceSort, priceRange, setPriceRange } = useSearchStore();
   const { toggleWishlist, isInWishlist } = useWishlistStore();
+
+  useEffect(() => {
+    const category = new URLSearchParams(location.search).get('category');
+    if (category) setCategoryFilter(category);
+  }, [location.search, setCategoryFilter]);
 
   useEffect(() => {
     async function fetchProducts() {
