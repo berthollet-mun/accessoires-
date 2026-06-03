@@ -13,6 +13,7 @@ import { maskProducts } from '../../utils/productMask';
 export default function ProductList() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const { searchQuery, categoryFilter, setCategoryFilter, priceSort, setPriceSort, priceRange, setPriceRange } = useSearchStore();
   const { toggleWishlist, isInWishlist } = useWishlistStore();
 
@@ -38,9 +39,12 @@ export default function ProductList() {
         const tx = db.transaction('products', 'readwrite');
         masked.forEach(p => tx.store.put(p));
         await tx.done;
-      } catch {
+        setLoadError(null);
+      } catch (error) {
         const cached = await db.getAll('products');
-        setProducts(maskProducts(cached));
+        const masked = maskProducts(cached);
+        setProducts(masked);
+        setLoadError(masked.length ? null : error instanceof Error ? error.message : 'Impossible de charger les produits');
       }
       setLoading(false);
     }
@@ -92,13 +96,11 @@ export default function ProductList() {
           </div>
 
           {/* Hero Image (We use the first product as featured) */}
-          <div className="hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 w-1/2 h-full items-center justify-center p-12 pointer-events-none">
-            {products[0] ? (
+          {products[0]?.image_url ? (
+            <div className="hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 w-1/2 h-full items-center justify-center p-12 pointer-events-none">
               <img src={products[0].image_url} alt="Featured" className="w-full h-full max-h-[500px] object-cover rounded-[2rem] drop-shadow-2xl opacity-90" />
-            ) : (
-              <img src="https://images.unsplash.com/photo-1548074902-86ee6dd529fa?auto=format&fit=crop&q=80&w=1000" alt="Featured" className="w-full h-full max-h-[500px] object-cover rounded-[2rem] drop-shadow-2xl opacity-90" />
-            )}
-          </div>
+            </div>
+          ) : null}
         </div>
       )}
 
@@ -161,6 +163,15 @@ export default function ProductList() {
             <ProductCardSkeleton />
             <ProductCardSkeleton />
           </>
+        ) : loadError ? (
+          <div className="md:col-span-2 lg:col-span-4 min-h-[220px] border border-base-border/10 rounded-2xl flex items-center justify-center text-center px-6">
+            <div className="max-w-md">
+              <p className="text-primary-text text-sm font-bold uppercase tracking-[0.18em] mb-3">Produits indisponibles</p>
+              <p className="text-primary-text/50 text-xs leading-relaxed">
+                La connexion a la base de donnees Supabase doit etre corrigee dans Vercel.
+              </p>
+            </div>
+          </div>
         ) : filteredProducts.map((product, idx) => (
           <motion.div 
             whileHover={{ scale: 1.02 }}
