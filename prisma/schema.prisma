@@ -16,6 +16,80 @@ model Product {
   image_url     String?
   created_at     DateTime @default(now()) @db.Timestamptz(6)
   updated_at     DateTime @default(now()) @updatedAt @db.Timestamptz(6)
+  order_items    OrderItem[]
 
   @@map("products")
+}
+
+model Profile {
+  id            String         @id @db.Uuid
+  first_name    String?
+  last_name     String?
+  role          String         @default("customer")
+  push_tokens   String[]       @default([])
+  created_at    DateTime       @default(now()) @db.Timestamptz(6)
+  updated_at    DateTime       @default(now()) @updatedAt @db.Timestamptz(6)
+  orders        Order[]
+  notifications Notification[]
+
+  @@map("profiles")
+}
+
+model Order {
+  id           String      @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  user_id      String?     @db.Uuid
+  status       String      @default("pending")
+  total_amount Decimal     @db.Decimal(10, 2)
+  invoice_url  String?
+  created_at   DateTime    @default(now()) @db.Timestamptz(6)
+  updated_at   DateTime    @default(now()) @updatedAt @db.Timestamptz(6)
+  profile      Profile?    @relation(fields: [user_id], references: [id], onDelete: SetNull)
+  order_items  OrderItem[]
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id         String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  order_id   String   @db.Uuid
+  product_id String   @db.Uuid
+  quantity   Int
+  unit_price Decimal  @db.Decimal(10, 2)
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  order      Order    @relation(fields: [order_id], references: [id], onDelete: Cascade)
+  product    Product  @relation(fields: [product_id], references: [id], onDelete: Restrict)
+
+  @@map("order_items")
+}
+
+model QRCode {
+  id         String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  target_url String
+  image_url  String
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+
+  @@map("qr_codes")
+}
+
+model Log {
+  id          String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  entity_type String?
+  entity_id   String?  @db.Uuid
+  action      String?
+  details     Json?
+  created_at  DateTime @default(now()) @db.Timestamptz(6)
+
+  @@map("logs")
+}
+
+model Notification {
+  id         String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  user_id    String   @db.Uuid
+  title      String
+  body       String
+  is_read    Boolean  @default(false)
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  profile    Profile  @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
 }
